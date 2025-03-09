@@ -1,49 +1,34 @@
-import React from 'react'
+import { useEffect, useState } from "react";
+import axios from "axios";
 
-const Home = () => {
-  return (
-    <div>
-     <img src="/ban.jpg" class="img-fluid w-100 pt-1" alt="..."/ >
-     <div class="row row-cols-1 row-cols-md-2 g-4 m-2">
-  <div class="col">
-    <div class="card">
-      <img src="/ban.jpg" class="card-img-top" alt="..."/>
-      <div class="card-body">
-        <h5 class="card-title">Veg Recipes</h5>
-        <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-      </div>
-    </div>
-  </div>
-  <div class="col">
-    <div class="card">
-      <img src="/ban.jpg" class="card-img-top" alt="..."/ >
-      <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-      </div>
-    </div>
-  </div>
-  <div class="col">
-    <div class="card">
-      <img src="/ban.jpg" class="card-img-top" alt="..."/ >
-      <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content.</p>
-      </div>
-    </div>
-  </div>
-  <div class="col">
-    <div class="card">
-      <img src="/ban.jpg" class="card-img-top" alt="..." />
-      <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-      </div>
-    </div>
-  </div>
-</div>
-    </div>
-  )
-}
+export const Home = () => {
+    const [recipes, setRecipes] = useState([]);
 
-export default Home
+    useEffect(() => {
+        fetchRecipes();
+    }, []);
+
+    const fetchRecipes = async () => {
+        try {
+            const response = await axios.get("https://backend-avth.onrender.com/recipes");
+            setRecipes(response.data);
+        } catch (err) {
+            console.error("Error fetching recipes:", err);
+        }
+    };
+
+    return (
+        <div className="container">
+            <h2>All Recipes</h2>
+            <ul>
+                {recipes.map((recipe) => (
+                    <li key={recipe._id}>
+                        <h3>{recipe.title}</h3>
+                        <p><strong>Ingredients:</strong> {recipe.ingredients}</p>
+                        <p><strong>Instructions:</strong> {recipe.instructions}</p>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+};

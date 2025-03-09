@@ -1,32 +1,41 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
-import "../App.css";  // Import CSS
-import Login from "./Login";
 
-const Register = ({ setIsLoggedIn }) => {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const navigate = useNavigate();
+const SavedRecipes = () => {
+    const [savedRecipes, setSavedRecipes] = useState([]);
 
-  const handleRegister = async () => {
-    await axios.post("http://localhost:5000/register", { username, email, password });
-    localStorage.setItem("username", username);
-    setIsLoggedIn(true);
-    navigate("/home");
-  };
+    useEffect(() => {
+        const fetchSavedRecipes = async () => {
+            try {
+                const response = await axios.get("https://backend-avth.onrender.com/saved-recipes");
+                setSavedRecipes(response.data);
+            } catch (error) {
+                console.error("Error fetching saved recipes:", error);
+            }
+        };
 
-  return (
-    <div className="container">
-      <h2>Register</h2>
-      <input type="text" placeholder="Username" onChange={(e) => setUsername(e.target.value)} />
-      <input type="email" placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
-      <input type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
-      <button onClick={handleRegister}>Register</button>
-      <p>Already have an account? <Link to="/login">Login</Link></p>
-    </div>
-  );
+        fetchSavedRecipes();
+    }, []);
+
+    return (
+        <div className="container">
+            <h2>Saved Recipes</h2>
+            {savedRecipes.length === 0 ? (
+                <p>No saved recipes found.</p>
+            ) : (
+                <ul>
+                    {savedRecipes.map((recipe) => (
+                        <li key={recipe._id}>
+                            <h3>{recipe.title}</h3>
+                            <p><strong>Ingredients:</strong> {recipe.ingredients}</p>
+                            <p><strong>Instructions:</strong> {recipe.instructions}</p>
+                            {recipe.imageUrl && <img src={recipe.imageUrl} alt={recipe.title} width="200px" />}
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </div>
+    );
 };
 
-export default Register;
+export default SavedRecipes;
